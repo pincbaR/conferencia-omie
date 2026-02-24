@@ -20,25 +20,39 @@
             --warning: #f59e0b;
             --danger: #ef4444;
             --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
             --gray-800: #1f2937;
+            --amazon: #ff9900;
+            --mercadolivre: #ffe600;
+            --magalu: #0086ff;
+            --shopify: #96bf48;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
-        body { background: var(--gray-100); color: var(--gray-800); }
+        body { background: #f8fafc; color: var(--gray-800); }
 
         .header {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             color: white;
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
         .logo { display: flex; align-items: center; gap: 1rem; }
-        .logo-icon { width: 48px; height: 48px; background: var(--primary); border-radius: 12px; 
-                     display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .logo-icon { 
+            width: 48px; height: 48px; 
+            background: linear-gradient(135deg, var(--primary), #1d4ed8); 
+            border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.5rem;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
 
         .main-container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
 
@@ -48,6 +62,7 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--gray-200);
         }
 
         .btn {
@@ -60,14 +75,68 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.875rem;
         }
 
         .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+        
+        .btn-success { 
+            background: var(--success); 
+            color: white; 
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+        }
+        .btn-success:hover { background: #059669; transform: translateY(-1px); }
+        
         .btn-warning { background: var(--warning); color: white; }
+        .btn-outline { 
+            background: transparent; 
+            border: 1px solid var(--gray-300); 
+            color: var(--gray-600);
+        }
+        .btn-outline:hover { background: var(--gray-100); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+
+        /* Filtros de Canal */
+        .filtros-container {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filtro-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gray-200);
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filtro-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .filtro-btn.active { 
+            background: var(--primary); 
+            color: white; 
+            border-color: var(--primary);
+        }
+
+        .filtro-btn.amazon.active { background: var(--amazon); border-color: var(--amazon); }
+        .filtro-btn.mercadolivre.active { 
+            background: var(--mercadolivre); 
+            border-color: var(--mercadolivre); 
+            color: #333;
+        }
+        .filtro-btn.magalu.active { background: var(--magalu); border-color: var(--magalu); }
+        .filtro-btn.shopify.active { background: var(--shopify); border-color: var(--shopify); }
 
         .pedido-card {
             background: white;
@@ -76,9 +145,14 @@
             cursor: pointer;
             transition: all 0.2s;
             border: 2px solid transparent;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .pedido-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: var(--primary); }
+        .pedido-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
+            border-color: var(--primary); 
+        }
 
         .tag {
             display: inline-block;
@@ -89,58 +163,384 @@
             text-transform: uppercase;
         }
 
-        .tag-amazon { background: #ff9900; color: white; }
-        .tag-mercadolivre { background: #ffe600; color: #333; }
-        .tag-magalu { background: #0086ff; color: white; }
+        .tag-amazon { background: var(--amazon); color: white; }
+        .tag-mercadolivre { background: var(--mercadolivre); color: #333; }
+        .tag-magalu { background: var(--magalu); color: white; }
+        .tag-shopify { background: var(--shopify); color: white; }
+        .tag-omie { background: #7c3aed; color: white; }
         .tag-default { background: var(--gray-100); color: #666; }
 
-        .input-field {
-            display: flex;
-            gap: 1rem;
-            margin: 1rem 0;
+        /* Layout de Conferência - 3 Colunas */
+        .conferencia-grid {
+            display: grid;
+            grid-template-columns: 1fr 280px 1fr;
+            gap: 1.5rem;
+            align-items: start;
         }
 
-        .input-field input {
-            flex: 1;
+        .conferencia-coluna {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .coluna-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .coluna-titulo {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-contador {
+            background: var(--gray-800);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-contador.success { background: var(--success); }
+
+        /* Scanner Area */
+        .scanner-area {
+            background: #f8fafc;
+            border-radius: 12px;
             padding: 1rem;
-            border: 2px solid #e5e7eb;
+            margin-bottom: 1rem;
+        }
+
+        .scanner-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .scanner-tab {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-300);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .scanner-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .scanner-input-group {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .scanner-input {
+            flex: 1;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--gray-200);
             border-radius: 8px;
             font-size: 1rem;
+            transition: border-color 0.2s;
         }
 
-        .input-field input:focus {
+        .scanner-input:focus {
             outline: none;
             border-color: var(--primary);
         }
 
+        .btn-conferir {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        /* Toggle Quantidade Digitada */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .toggle-info h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toggle-info p {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: var(--gray-300);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--success);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+
+        /* Ações Central */
+        .acoes-central {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn-finalizar-volume {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 1.25rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-finalizar-volume:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-finalizar-volume:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-finalizar-volume i {
+            font-size: 1.5rem;
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.875rem;
+            text-decoration: underline;
+            padding: 0.5rem;
+        }
+
+        /* Itens Cards */
         .item-card {
             display: flex;
             align-items: center;
             gap: 1rem;
             padding: 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
             margin-bottom: 0.75rem;
+            background: white;
+            transition: all 0.2s;
         }
 
-        .item-card.conferido { opacity: 0.6; background: #f9fafb; }
+        .item-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
 
-        .item-imagem { width: 60px; height: 60px; background: #f3f4f6; border-radius: 8px; 
-                       display: flex; align-items: center; justify-content: center; }
+        .item-card.conferido { 
+            opacity: 0.7; 
+            background: #f0fdf4;
+            border-color: var(--success);
+        }
 
-        .item-info { flex: 1; }
-        .item-nome { font-weight: 600; margin-bottom: 0.25rem; }
-        .item-detalhes { font-size: 0.875rem; color: #6b7280; }
+        .item-imagem { 
+            width: 60px; 
+            height: 60px; 
+            background: var(--gray-100); 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
 
-        .badge {
-            padding: 0.25rem 0.75rem;
-            background: #374151;
-            color: white;
-            border-radius: 20px;
+        .item-imagem img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-info { flex: 1; min-width: 0; }
+        .item-nome { 
+            font-weight: 600; 
+            margin-bottom: 0.25rem;
+            font-size: 0.9375rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .item-detalhes { 
+            font-size: 0.75rem; 
+            color: var(--gray-600);
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .item-quantidade {
+            text-align: right;
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--gray-800);
+        }
+
+        .item-quantidade .total {
+            color: var(--gray-600);
+            font-weight: 400;
+        }
+
+        /* Barra de Progresso do Item */
+        .item-progresso {
+            width: 100%;
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .item-progresso-barra {
+            height: 100%;
+            background: var(--success);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        /* Info Cards no Topo */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .info-card-label {
             font-size: 0.75rem;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .badge.success { background: var(--success); }
+        .info-card-value {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-card-sub {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        /* Rodapé de Ações */
+        .rodape-acoes {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--gray-200);
+            margin-top: 1.5rem;
+        }
+
+        .progresso-geral {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .progresso-barra-container {
+            width: 200px;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progresso-barra-preenchido {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #3b82f6);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .botoes-rodape {
+            display: flex;
+            gap: 0.75rem;
+        }
 
         .hidden { display: none !important; }
 
@@ -157,7 +557,7 @@
 
         .spinner {
             width: 50px; height: 50px;
-            border: 4px solid #e5e7eb;
+            border: 4px solid var(--gray-200);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -181,6 +581,7 @@
             font-weight: 500;
             animation: slideIn 0.3s ease-out;
             min-width: 300px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .toast.success { background: var(--success); }
@@ -192,44 +593,7 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
-        .etiqueta-preview {
-            background: white;
-            border: 2px dashed #d1d5db;
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .etiqueta-content {
-            max-width: 400px;
-            margin: 0 auto;
-            border: 2px solid #1f2937;
-            border-radius: 8px;
-            padding: 1.5rem;
-            background: white;
-            text-align: left;
-        }
-
-        .etiqueta-header {
-            text-align: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #1f2937;
-        }
-
-        .etiqueta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .etiqueta-field.full { grid-column: 1 / -1; }
-        .etiqueta-label { font-size: 0.625rem; color: #6b7280; text-transform: uppercase; }
-        .etiqueta-value { font-size: 0.875rem; font-weight: 700; }
-
-        .barcode-area { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; }
-
+        /* Modal Etiqueta - Estilo Correto */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -244,31 +608,150 @@
             background: white;
             border-radius: 16px;
             width: 90%;
-            max-width: 600px;
+            max-width: 500px;
             max-height: 90vh;
             overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
         }
 
         .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: var(--gray-50);
         }
 
-        .modal-body { padding: 1.5rem; overflow-y: auto; max-height: 60vh; }
-        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 0.75rem; }
+        .modal-body { 
+            padding: 1.5rem; 
+            overflow-y: auto; 
+            max-height: 60vh;
+            background: #f8fafc;
+        }
+
+        .modal-footer { 
+            padding: 1rem 1.5rem; 
+            border-top: 1px solid var(--gray-200); 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 0.75rem;
+            background: white;
+        }
 
         .close-btn {
-            background: none; border: none; font-size: 1.5rem; color: #9ca3af;
-            cursor: pointer; width: 32px; height: 32px;
-            display: flex; align-items: center; justify-content: center;
+            background: none; 
+            border: none; 
+            font-size: 1.5rem; 
+            color: var(--gray-600);
+            cursor: pointer; 
+            width: 32px; 
+            height: 32px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
             border-radius: 8px;
+            transition: all 0.2s;
         }
 
-        .close-btn:hover { background: #f3f4f6; color: #6b7280; }
+        .close-btn:hover { background: var(--gray-100); color: var(--gray-800); }
 
+        /* Etiqueta de Transporte - Layout Correto para Impressão */
+        .etiqueta-container {
+            background: white;
+            border: 2px dashed var(--gray-300);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .etiqueta-content {
+            max-width: 380px;
+            margin: 0 auto;
+            border: 2px solid #1f2937;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: white;
+        }
+
+        .etiqueta-header {
+            text-align: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #1f2937;
+        }
+
+        .etiqueta-header h2 {
+            margin: 0;
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .etiqueta-header p {
+            margin: 0.25rem 0 0 0;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+
+        .etiqueta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .etiqueta-field.full { grid-column: 1 / -1; }
+        
+        .etiqueta-label { 
+            font-size: 0.625rem; 
+            color: var(--gray-600); 
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.125rem;
+        }
+        
+        .etiqueta-value { 
+            font-size: 0.9375rem; 
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .etiqueta-field.full .etiqueta-value {
+            font-size: 1.125rem;
+        }
+
+        .barcode-area { 
+            margin-top: 1rem; 
+            padding-top: 1rem; 
+            border-top: 1px solid var(--gray-200);
+            text-align: center;
+        }
+
+        .barcode-area svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .chave-nfe {
+            font-family: monospace;
+            font-size: 0.6875rem;
+            color: var(--gray-600);
+            word-break: break-all;
+            margin-top: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .etiqueta-footer {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--gray-200);
+            font-size: 0.625rem;
+            color: var(--gray-500);
+            text-align: center;
+        }
+
+        /* Config Box */
         .config-box {
             background: #f0fdf4;
             border: 1px solid #86efac;
@@ -280,9 +763,77 @@
         .config-box h4 { color: #166534; margin-bottom: 0.5rem; }
         .config-box p { color: #166534; font-size: 0.875rem; margin: 0.25rem 0; }
 
+        /* Input fields */
+        .input-field {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .input-field input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .input-field input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Status vazio */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-600);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.5;
+        }
+
+        /* Print styles - Apenas etiqueta */
         @media print {
-            .header, .input-field, .modal { display: none !important; }
-            .etiqueta-content { border: 2px solid #000; }
+            body * {
+                visibility: hidden;
+            }
+            .modal-etiqueta-print,
+            .modal-etiqueta-print * {
+                visibility: visible;
+            }
+            .modal-etiqueta-print {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            .modal-header, .modal-footer, .close-btn {
+                display: none !important;
+            }
+            .etiqueta-container {
+                border: none;
+                padding: 0;
+            }
+            .etiqueta-content {
+                border: 2px solid #000;
+                max-width: none;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .conferencia-grid {
+                grid-template-columns: 1fr;
+            }
+            .info-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -299,11 +850,11 @@
             <div class="logo-icon">📦</div>
             <div>
                 <h1>Conferência de Pedidos</h1>
-                <p style="font-size: 0.875rem; color: #9ca3af;">Omie ERP + Supabase</p>
+                <p style="font-size: 0.875rem; color: #94a3b8;">Omie ERP + Supabase</p>
             </div>
         </div>
         <div style="display: flex; gap: 1rem; align-items: center;">
-            <span id="status-badge" style="padding: 0.5rem 1rem; background: rgba(16,185,129,0.2); color: #10b981; border-radius: 20px; font-size: 0.875rem;">
+            <span id="status-badge" style="padding: 0.5rem 1rem; background: rgba(16,185,129,0.2); color: #10b981; border-radius: 20px; font-size: 0.875rem; font-weight: 500;">
                 <i class="fas fa-circle" style="font-size: 0.5rem; margin-right: 0.5rem;"></i>Online
             </span>
             <button class="btn" style="background: rgba(255,255,255,0.1); color: white;" onclick="toggleSimulacao()">
@@ -314,7 +865,7 @@
 
     <!-- Main -->
     <main class="main-container">
-        <!-- Configuração Automática -->
+        <!-- Configuração -->
         <section id="config-section" class="card">
             <h2 style="margin-bottom: 1rem;"><i class="fas fa-cog"></i> Configuração do Sistema</h2>
 
@@ -357,7 +908,7 @@
 
         <!-- Lista de Pedidos -->
         <section id="pedidos-section" class="hidden">
-            <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                 <div>
                     <h2><i class="fas fa-clipboard-list"></i> Pedidos Faturados</h2>
                     <p style="color: #6b7280; font-size: 0.875rem;">Selecione um pedido para conferir</p>
@@ -367,91 +918,180 @@
                 </button>
             </div>
 
+            <!-- Filtros de Canal -->
+            <div class="filtros-container">
+                <span style="font-weight: 600; color: var(--gray-600);">Filtrar por canal:</span>
+                <button class="filtro-btn active" onclick="filtrarCanal('todos')" data-canal="todos">
+                    <i class="fas fa-th-large"></i> Todos
+                </button>
+                <button class="filtro-btn amazon" onclick="filtrarCanal('Amazon')" data-canal="Amazon">
+                    <i class="fab fa-amazon"></i> Amazon
+                </button>
+                <button class="filtro-btn mercadolivre" onclick="filtrarCanal('Mercado Livre')" data-canal="Mercado Livre">
+                    <i class="fas fa-shopping-bag"></i> Mercado Livre
+                </button>
+                <button class="filtro-btn magalu" onclick="filtrarCanal('Magalu')" data-canal="Magalu">
+                    <i class="fas fa-store"></i> Magalu
+                </button>
+                <button class="filtro-btn shopify" onclick="filtrarCanal('Shopify')" data-canal="Shopify">
+                    <i class="fab fa-shopify"></i> Shopify
+                </button>
+                <button class="filtro-btn" style="background: #7c3aed20; color: #7c3aed;" onclick="filtrarCanal('Omie')" data-canal="Omie">
+                    <i class="fas fa-erp"></i> Omie
+                </button>
+            </div>
+
             <div id="lista-pedidos" class="grid">
                 <!-- Pedidos serão carregados aqui -->
             </div>
         </section>
 
-        <!-- Detalhes do Pedido -->
+        <!-- Detalhes do Pedido - Layout Novo -->
         <section id="detalhes-section" class="hidden">
-            <button class="btn" style="margin-bottom: 1rem; background: #f3f4f6; color: #374151;" onclick="voltarLista()">
-                <i class="fas fa-arrow-left"></i> Voltar
+            <button class="btn btn-outline" style="margin-bottom: 1rem;" onclick="voltarLista()">
+                <i class="fas fa-arrow-left"></i> Voltar para Pedidos
             </button>
 
-            <div class="card">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
-                    <div>
-                        <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Pedido</label>
-                        <div id="info-pedido" style="font-size: 1.25rem; font-weight: 700;">-</div>
-                        <span id="tag-origem" class="tag tag-default">-</span>
+            <!-- Info Cards -->
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-card-label">
+                        <i class="fas fa-hashtag"></i> Pedido / Chave
                     </div>
-                    <div>
-                        <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Cliente</label>
-                        <div id="info-cliente" style="font-size: 1.125rem; font-weight: 700;">-</div>
-                        <div id="info-cnpj" style="font-size: 0.875rem; color: #6b7280;">-</div>
+                    <div class="info-card-value" id="info-pedido">-</div>
+                    <div class="info-card-sub" id="tag-origem-container">
+                        <span class="tag tag-default" id="tag-origem">-</span>
                     </div>
-                    <div>
-                        <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Nota Fiscal</label>
-                        <div id="info-nf" style="font-size: 1.125rem; font-weight: 700;">-</div>
-                        <div id="info-chave" style="font-size: 0.75rem; color: #6b7280; font-family: monospace;">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">
+                        <i class="fas fa-user"></i> Cliente
                     </div>
-                    <div>
-                        <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Transportadora</label>
-                        <div id="info-transportadora" style="font-size: 1.125rem; font-weight: 700;">-</div>
+                    <div class="info-card-value" id="info-cliente">-</div>
+                    <div class="info-card-sub" id="info-cnpj">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">
+                        <i class="fas fa-file-invoice"></i> Nota Fiscal
                     </div>
-                    <div>
-                        <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Volumes</label>
-                        <div id="info-volumes" style="font-size: 1.125rem; font-weight: 700;">-</div>
+                    <div class="info-card-value" id="info-nf">-</div>
+                    <div class="info-card-sub" id="info-chave" style="font-family: monospace; font-size: 0.75rem;">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">
+                        <i class="fas fa-truck"></i> Transportadora
+                    </div>
+                    <div class="info-card-value" id="info-transportadora">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">
+                        <i class="fas fa-boxes"></i> Volumes
+                    </div>
+                    <div class="info-card-value" id="info-volumes">-</div>
+                    <div class="info-card-sub">20×35×45 cm</div>
+                </div>
+            </div>
+
+            <!-- Scanner Area -->
+            <div class="card" style="padding: 1rem;">
+                <div class="scanner-area">
+                    <div class="scanner-tabs">
+                        <button class="scanner-tab active" onclick="setScanMode('scanner')">
+                            <i class="fas fa-barcode"></i> Scanner
+                        </button>
+                        <button class="scanner-tab" onclick="setScanMode('codigo')">
+                            <i class="fas fa-keyboard"></i> Código de Barras
+                        </button>
+                        <button class="scanner-tab" onclick="setScanMode('sku')">
+                            <i class="fas fa-tag"></i> SKU
+                        </button>
+                    </div>
+                    <div class="scanner-input-group">
+                        <input type="text" id="input-codigo" class="scanner-input" 
+                               placeholder="Código de barras ou SKU..." autofocus>
+                        <button class="btn-conferir" onclick="conferirItem()">
+                            <i class="fas fa-check"></i> Conferir Item
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Conferência -->
-            <div class="card">
-                <h3 style="margin-bottom: 1rem;"><i class="fas fa-barcode"></i> Conferência de Itens</h3>
-
-                <div class="input-field">
-                    <input type="text" id="input-codigo" placeholder="Escaneie o código de barras ou digite o SKU..." autofocus>
-                    <button class="btn btn-success" onclick="conferirItem()">
-                        <i class="fas fa-check"></i> Conferir
-                    </button>
-                </div>
-
-                <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; cursor: pointer;">
-                    <input type="checkbox" id="modo-individual" style="width: 20px; height: 20px;">
-                    <span>Modo Individual (bipe cada item separadamente)</span>
-                </label>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <!-- Pendentes -->
-                    <div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h4><i class="fas fa-clock"></i> Pendentes</h4>
-                            <span id="badge-pendentes" class="badge">0</span>
+            <!-- Grid de Conferência -->
+            <div class="conferencia-grid">
+                <!-- Coluna 1: Itens Pendentes -->
+                <div class="conferencia-coluna">
+                    <div class="coluna-header">
+                        <div class="coluna-titulo">
+                            <i class="fas fa-clock" style="color: var(--warning);"></i>
+                            Itens Pendentes
                         </div>
-                        <div id="lista-pendentes" style="max-height: 400px; overflow-y: auto;">
-                            <!-- Itens pendentes -->
-                        </div>
+                        <span id="badge-pendentes" class="badge-contador">0</span>
                     </div>
-
-                    <!-- Conferidos -->
-                    <div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h4><i class="fas fa-check-circle"></i> Conferidos</h4>
-                            <span id="badge-conferidos" class="badge success">0</span>
-                        </div>
-                        <div id="lista-conferidos" style="max-height: 400px; overflow-y: auto;">
-                            <!-- Itens conferidos -->
-                        </div>
+                    <div id="lista-pendentes">
+                        <!-- Itens pendentes -->
                     </div>
                 </div>
 
-                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb; display: flex; gap: 1rem;">
-                    <button class="btn btn-warning" id="btn-volume" onclick="finalizarVolume()" disabled>
-                        <i class="fas fa-box-open"></i> Finalizar Volume
+                <!-- Coluna 2: Ações e Toggle -->
+                <div class="conferencia-coluna" style="background: #f8fafc;">
+                    <div class="toggle-container">
+                        <div class="toggle-info">
+                            <h4>Quantidade Digitada</h4>
+                            <p>Digite a quantidade conferida manualmente</p>
+                        </div>
+                        <div class="toggle-switch" id="toggle-quantidade" onclick="toggleQuantidadeDigitada()"></div>
+                    </div>
+
+                    <div class="acoes-central">
+                        <button class="btn-finalizar-volume" id="btn-volume" onclick="finalizarVolume()" disabled>
+                            <i class="fas fa-box-open"></i>
+                            <span>Finalizar Volume</span>
+                        </button>
+                        
+                        <button class="btn-link" onclick="imprimirEtiquetaParcial()">
+                            <i class="fas fa-print"></i> Imprimir etiqueta parcial
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Coluna 3: Itens Conferidos -->
+                <div class="conferencia-coluna" style="background: #f0fdf4;">
+                    <div class="coluna-header">
+                        <div class="coluna-titulo">
+                            <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                            Itens Conferidos
+                        </div>
+                        <span id="badge-conferidos" class="badge-contador success">0</span>
+                    </div>
+                    <div id="lista-conferidos">
+                        <!-- Itens conferidos -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rodapé com Progresso -->
+            <div class="rodape-acoes">
+                <div class="progresso-geral">
+                    <div>
+                        <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.25rem;">
+                            Progresso: <span id="progresso-texto">0 de 0 itens</span>
+                        </div>
+                        <div class="progresso-barra-container">
+                            <div class="progresso-barra-preenchido" id="progresso-barra" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <span id="progresso-porcentagem" style="font-weight: 700; color: var(--primary);">0%</span>
+                </div>
+                
+                <div class="botoes-rodape">
+                    <button class="btn btn-outline" onclick="reiniciarConferencia()">
+                        <i class="fas fa-redo"></i> Reiniciar
                     </button>
-                    <button class="btn btn-primary" id="btn-checkout" onclick="finalizarCheckout()" disabled>
-                        <i class="fas fa-flag-checkered"></i> Finalizar Checkout
+                    <button class="btn btn-outline" onclick="checkoutParcial()">
+                        <i class="fas fa-clipboard-check"></i> Checkout Parcial
+                    </button>
+                    <button class="btn btn-success" id="btn-checkout" onclick="finalizarCheckout()" disabled>
+                        <i class="fas fa-flag-checkered"></i> Finalizar Conferência
                     </button>
                 </div>
             </div>
@@ -460,18 +1100,22 @@
 
     <!-- Modal Etiqueta -->
     <div id="modal-etiqueta" class="modal hidden">
-        <div class="modal-content">
+        <div class="modal-content modal-etiqueta-print">
             <div class="modal-header">
-                <h3><i class="fas fa-barcode"></i> Etiqueta de Transporte</h3>
+                <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-barcode"></i> Etiqueta de Transporte
+                </h3>
                 <button class="close-btn" onclick="fecharModal('modal-etiqueta')">&times;</button>
             </div>
             <div class="modal-body">
-                <div id="etiqueta-preview" class="etiqueta-preview">
-                    <!-- Preview -->
+                <div class="etiqueta-container">
+                    <div id="etiqueta-preview" class="etiqueta-content">
+                        <!-- Preview da etiqueta -->
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn" style="background: #f3f4f6; color: #374151;" onclick="fecharModal('modal-etiqueta')">Fechar</button>
+                <button class="btn btn-outline" onclick="fecharModal('modal-etiqueta')">Fechar</button>
                 <button class="btn btn-primary" onclick="imprimirEtiqueta()">
                     <i class="fas fa-print"></i> Imprimir
                 </button>
@@ -484,10 +1128,11 @@
 
     <script>
         // ==========================================
-        // CONFIGURAÇÕES AUTOMÁTICAS (JÁ CONFIGURADO)
+        // CONFIGURAÇÕES
         // ==========================================
         const SUPABASE_URL = 'https://jdwapykybazd1hrzgpmh.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impkd2FweWt5YmF6ZDFocnpncG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDg3NjU0MDAsImV4cCI6MjAyNDM0MTQwMH0.HCSmV7eu';
+        const FUNCTION_NAME = 'smart-api'; // Nome da sua Edge Function
 
         let supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -497,28 +1142,31 @@
             baseUrl: 'https://app.omie.com.br/api/v1'
         };
 
-        // Resto do código JavaScript (igual ao anterior)
         let estado = {
             modoSimulacao: false,
             pedidos: [],
+            pedidosFiltrados: [],
+            filtroCanal: 'todos',
             pedidoAtual: null,
             itensPendentes: [],
             itensConferidos: [],
             volumesFinalizados: [],
-            modoIndividual: false
+            modoQuantidadeDigitada: false,
+            scanMode: 'scanner'
         };
 
-        // Inicialização
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('input-codigo').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') conferirItem();
             });
-
-            document.getElementById('modo-individual').addEventListener('change', (e) => {
-                estado.modoIndividual = e.target.checked;
-            });
         });
 
+        // ==========================================
+        // CONEXÃO COM SUPABASE/OMIE
+        // ==========================================
         async function conectarSupabase() {
             omieConfig.appKey = document.getElementById('omie-key').value.trim();
             omieConfig.appSecret = document.getElementById('omie-secret').value.trim();
@@ -531,19 +1179,25 @@
             showLoading(true, 'Testando conexão...');
 
             try {
-                // Tentar chamar Edge Function
-                const { data, error } = await supabaseClient.functions.invoke('omie-proxy', {
-                    body: {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/${FUNCTION_NAME}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
                         endpoint: 'geral/empresas',
                         call: 'ListarEmpresas',
                         param: [{}],
                         appKey: omieConfig.appKey,
                         appSecret: omieConfig.appSecret
-                    }
+                    })
                 });
 
-                if (error) throw error;
+                if (!response.ok) throw new Error('Erro na conexão');
 
+                const data = await response.json();
+                
                 showToast('Conectado com sucesso!', 'success');
                 document.getElementById('config-section').classList.add('hidden');
                 document.getElementById('pedidos-section').classList.remove('hidden');
@@ -558,7 +1212,9 @@
             }
         }
 
-        // Funções de simulação e conferência (mantidas do código anterior)
+        // ==========================================
+        // MODO SIMULAÇÃO
+        // ==========================================
         function toggleSimulacao() {
             estado.modoSimulacao = !estado.modoSimulacao;
 
@@ -607,13 +1263,78 @@
                     itens: [
                         { codigo: '004', sku: 'MOUSE-WL', nome: 'Mouse Wireless', ean: '7891234567898', quantidade: 2, imagem: 'https://placehold.co/60x60/ef4444/ffffff?text=MOU' }
                     ]
+                },
+                {
+                    codigo: '123458',
+                    numero: 'PED-2024-005',
+                    cliente: '125',
+                    nomeCliente: 'Loja Shopify Teste',
+                    cnpjCliente: '33.444.555/0001-66',
+                    nfNumero: '12349',
+                    nfSerie: '1',
+                    nfChave: '35240212345678000190550010001234971234567892',
+                    transportadora: 'Jadlog',
+                    volumes: 2,
+                    peso: { bruto: 1.5, liquido: 1.2 },
+                    origem: 'Shopify',
+                    itens: [
+                        { codigo: '005', sku: 'FONE-BT', nome: 'Fone Bluetooth', ean: '7891234567899', quantidade: 1, imagem: 'https://placehold.co/60x60/8b5cf6/ffffff?text=FON' }
+                    ]
+                },
+                {
+                    codigo: '123459',
+                    numero: 'PED-2024-006',
+                    cliente: '126',
+                    nomeCliente: 'Magazine Luiza Virtual',
+                    cnpjCliente: '44.555.666/0001-77',
+                    nfNumero: '12350',
+                    nfSerie: '1',
+                    nfChave: '35240212345678000190550010001235081234567893',
+                    transportadora: 'Total Express',
+                    volumes: 1,
+                    peso: { bruto: 0.8, liquido: 0.6 },
+                    origem: 'Magalu',
+                    itens: [
+                        { codigo: '006', sku: 'CARREG-USB', nome: 'Carregador USB-C', ean: '7891234567900', quantidade: 2, imagem: 'https://placehold.co/60x60/0086ff/ffffff?text=CAR' }
+                    ]
                 }
             ];
-
-            renderizarPedidos();
+            
+            aplicarFiltro();
             showToast('Dados de demonstração carregados', 'success');
         }
 
+        // ==========================================
+        // FILTROS DE CANAL
+        // ==========================================
+        function filtrarCanal(canal) {
+            estado.filtroCanal = canal;
+            
+            // Atualizar botões
+            document.querySelectorAll('.filtro-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.canal === canal) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            aplicarFiltro();
+        }
+
+        function aplicarFiltro() {
+            if (estado.filtroCanal === 'todos') {
+                estado.pedidosFiltrados = [...estado.pedidos];
+            } else {
+                estado.pedidosFiltrados = estado.pedidos.filter(p => 
+                    p.origem === estado.filtroCanal
+                );
+            }
+            renderizarPedidos();
+        }
+
+        // ==========================================
+        // CARREGAR PEDIDOS (REAL)
+        // ==========================================
         async function carregarPedidos() {
             if (estado.modoSimulacao) {
                 carregarPedidosSimulados();
@@ -623,22 +1344,30 @@
             showLoading(true, 'Buscando pedidos...');
 
             try {
-                const { data, error } = await supabaseClient.functions.invoke('omie-proxy', {
-                    body: {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/${FUNCTION_NAME}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
                         endpoint: 'produtos/pedido',
                         call: 'ListarPedidos',
                         param: [{ pagina: 1, registros_por_pagina: 50 }],
                         appKey: omieConfig.appKey,
                         appSecret: omieConfig.appSecret
-                    }
+                    })
                 });
 
-                if (error) throw error;
+                if (!response.ok) throw new Error('Erro ao carregar pedidos');
 
-                // Processar pedidos (simplificado)
-                estado.pedidos = [];
+                const data = await response.json();
+                
+                // Processar pedidos da Omie
+                estado.pedidos = processarPedidosOmie(data);
+                aplicarFiltro();
+                
                 showToast('Pedidos carregados!', 'success');
-                renderizarPedidos();
 
             } catch (error) {
                 console.error('Erro:', error);
@@ -648,10 +1377,19 @@
             }
         }
 
+        function processarPedidosOmie(data) {
+            // Implementar processamento real dos dados da Omie
+            // Por enquanto retorna vazio ou dados simulados
+            return [];
+        }
+
+        // ==========================================
+        // RENDERIZAR PEDIDOS
+        // ==========================================
         function renderizarPedidos() {
             const container = document.getElementById('lista-pedidos');
 
-            if (estado.pedidos.length === 0) {
+            if (estado.pedidosFiltrados.length === 0) {
                 container.innerHTML = `
                     <div class="card" style="grid-column: 1/-1; text-align: center; padding: 3rem;">
                         <i class="fas fa-inbox" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
@@ -661,7 +1399,7 @@
                 return;
             }
 
-            container.innerHTML = estado.pedidos.map(p => `
+            container.innerHTML = estado.pedidosFiltrados.map(p => `
                 <div class="pedido-card" onclick="selecionarPedido('${p.codigo}')">
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
                         <div style="font-size: 1.25rem; font-weight: 700;">${p.numero}</div>
@@ -681,10 +1419,14 @@
             `).join('');
         }
 
+        // ==========================================
+        // SELECIONAR PEDIDO
+        // ==========================================
         function selecionarPedido(codigo) {
             estado.pedidoAtual = estado.pedidos.find(p => p.codigo === codigo);
             if (!estado.pedidoAtual) return;
 
+            // Clonar itens para conferência
             estado.itensPendentes = estado.pedidoAtual.itens.map(item => ({
                 ...item,
                 quantidadeConferida: 0,
@@ -696,6 +1438,7 @@
             document.getElementById('pedidos-section').classList.add('hidden');
             document.getElementById('detalhes-section').classList.remove('hidden');
 
+            // Preencher info cards
             document.getElementById('info-pedido').textContent = estado.pedidoAtual.numero;
             document.getElementById('tag-origem').textContent = estado.pedidoAtual.origem;
             document.getElementById('tag-origem').className = `tag tag-${estado.pedidoAtual.origem.toLowerCase().replace(/\s/g, '')}`;
@@ -707,6 +1450,7 @@
             document.getElementById('info-volumes').textContent = `${estado.pedidoAtual.volumes} volume(s) - ${estado.pedidoAtual.peso.bruto}kg`;
 
             renderizarItens();
+            atualizarProgressoGeral();
             document.getElementById('input-codigo').focus();
         }
 
@@ -715,6 +1459,9 @@
             return chave.match(/.{1,4}/g).join(' ');
         }
 
+        // ==========================================
+        // RENDERIZAR ITENS (COM BARRA DE PROGRESSO)
+        // ==========================================
         function renderizarItens() {
             const pendentesContainer = document.getElementById('lista-pendentes');
             const conferidosContainer = document.getElementById('lista-conferidos');
@@ -727,62 +1474,112 @@
             document.getElementById('badge-pendentes').textContent = totalPendentes;
             document.getElementById('badge-conferidos').textContent = totalConferidos;
 
+            // Itens Pendentes
             const pendentes = estado.itensPendentes.filter(item => item.quantidadeConferida < item.quantidade);
 
             if (pendentes.length === 0) {
                 pendentesContainer.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: #10b981;">
-                        <i class="fas fa-check-circle" style="font-size: 2rem;"></i>
-                        <p style="margin-top: 0.5rem;">Todos conferidos!</p>
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <p>Todos os itens conferidos!</p>
                     </div>
                 `;
             } else {
-                pendentesContainer.innerHTML = pendentes.map(item => `
+                pendentesContainer.innerHTML = pendentes.map(item => {
+                    const progresso = (item.quantidadeConferida / item.quantidade) * 100;
+                    return `
                     <div class="item-card">
                         <div class="item-imagem">
-                            <img src="${item.imagem}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" 
-                                 onerror="this.src='https://placehold.co/60x60/cccccc/666666?text=PROD'">
+                            <img src="${item.imagem}" onerror="this.src='https://placehold.co/60x60/cccccc/666666?text=PROD'">
                         </div>
                         <div class="item-info">
                             <div class="item-nome">${item.nome}</div>
-                            <div class="item-detalhes">SKU: ${item.sku} | EAN: ${item.ean}</div>
+                            <div class="item-detalhes">
+                                <span>SKU: ${item.sku}</span>
+                                <span>EAN: ${item.ean}</span>
+                            </div>
+                            ${progresso > 0 ? `
+                            <div class="item-progresso">
+                                <div class="item-progresso-barra" style="width: ${progresso}%;"></div>
+                            </div>
+                            ` : ''}
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 1.25rem; font-weight: 700;">${item.quantidadeConferida}/${item.quantidade}</div>
-                            <div style="font-size: 0.75rem; color: #6b7280;">unidades</div>
+                        <div class="item-quantidade">
+                            ${item.quantidadeConferida}<span class="total">/${item.quantidade}</span>
+                            <div style="font-size: 0.75rem; color: #6b7280; font-weight: 400;">unidades</div>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             }
 
+            // Itens Conferidos
             if (estado.itensConferidos.length === 0) {
                 conferidosContainer.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: #9ca3af;">
-                        <i class="fas fa-box-open" style="font-size: 2rem;"></i>
-                        <p style="margin-top: 0.5rem;">Nenhum item conferido</p>
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p>Nenhum item conferido</p>
                     </div>
                 `;
             } else {
                 conferidosContainer.innerHTML = estado.itensConferidos.map(item => `
                     <div class="item-card conferido">
                         <div class="item-imagem">
-                            <img src="${item.imagem}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
-                                 onerror="this.src='https://placehold.co/60x60/cccccc/666666?text=PROD'">
+                            <img src="${item.imagem}" onerror="this.src='https://placehold.co/60x60/cccccc/666666?text=PROD'">
                         </div>
                         <div class="item-info">
                             <div class="item-nome">${item.nome}</div>
-                            <div class="item-detalhes">SKU: ${item.sku}</div>
+                            <div class="item-detalhes">
+                                <span>SKU: ${item.sku}</span>
+                            </div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 1.25rem; font-weight: 700; color: #10b981;">${item.quantidadeConferida}</div>
-                            <div style="font-size: 0.75rem; color: #6b7280;">conferido</div>
+                        <div class="item-quantidade" style="color: var(--success);">
+                            ${item.quantidadeConferida}
+                            <div style="font-size: 0.75rem; font-weight: 400;">
+                                <i class="fas fa-check-circle"></i> Conferido
+                            </div>
                         </div>
                     </div>
                 `).join('');
             }
 
+            // Atualizar botões
             document.getElementById('btn-volume').disabled = estado.itensConferidos.length === 0;
-            document.getElementById('btn-checkout').disabled = totalPendentes > 0 && estado.itensConferidos.length === 0;
+            document.getElementById('btn-checkout').disabled = pendentes.length > 0;
+            
+            atualizarProgressoGeral();
+        }
+
+        function atualizarProgressoGeral() {
+            const totalItens = estado.itensPendentes.length;
+            const itensConferidos = estado.itensConferidos.length;
+            const porcentagem = totalItens > 0 ? Math.round((itensConferidos / totalItens) * 100) : 0;
+
+            document.getElementById('progresso-texto').textContent = `${itensConferidos} de ${totalItens} itens`;
+            document.getElementById('progresso-barra').style.width = `${porcentagem}%`;
+            document.getElementById('progresso-porcentagem').textContent = `${porcentagem}%`;
+        }
+
+        // ==========================================
+        // SCANNER E CONFERÊNCIA
+        // ==========================================
+        function setScanMode(mode) {
+            estado.scanMode = mode;
+            document.querySelectorAll('.scanner-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.closest('.scanner-tab').classList.add('active');
+            
+            const input = document.getElementById('input-codigo');
+            const placeholders = {
+                scanner: 'Código de barras ou SKU...',
+                codigo: 'Digite o código de barras...',
+                sku: 'Digite o SKU do produto...'
+            };
+            input.placeholder = placeholders[mode];
+            input.focus();
+        }
+
+        function toggleQuantidadeDigitada() {
+            estado.modoQuantidadeDigitada = !estado.modoQuantidadeDigitada;
+            document.getElementById('toggle-quantidade').classList.toggle('active', estado.modoQuantidadeDigitada);
         }
 
         function conferirItem() {
@@ -814,14 +1611,23 @@
                 return;
             }
 
-            if (estado.modoIndividual) {
-                item.quantidadeConferida++;
-                showToast(`${item.nome} - ${item.quantidadeConferida}/${item.quantidade}`, 'success');
+            if (estado.modoQuantidadeDigitada) {
+                // Modo quantidade digitada - abrir prompt
+                const qtd = prompt(`Digite a quantidade conferida para ${item.nome}:`, '1');
+                const quantidade = parseInt(qtd);
+                if (isNaN(quantidade) || quantidade <= 0) {
+                    showToast('Quantidade inválida', 'error');
+                    return;
+                }
+                item.quantidadeConferida = Math.min(item.quantidadeConferida + quantidade, item.quantidade);
             } else {
-                item.quantidadeConferida = item.quantidade;
-                showToast(`${item.nome} - Quantidade total conferida`, 'success');
+                // Modo scanner - incrementa 1
+                item.quantidadeConferida++;
             }
 
+            showToast(`${item.nome} - ${item.quantidadeConferida}/${item.quantidade}`, 'success');
+
+            // Se completou, mover para conferidos
             if (item.quantidadeConferida >= item.quantidade) {
                 item.conferido = true;
                 estado.itensConferidos.unshift({ ...item });
@@ -832,6 +1638,9 @@
             renderizarItens();
         }
 
+        // ==========================================
+        // FINALIZAR VOLUME (CORRIGIDO)
+        // ==========================================
         function finalizarVolume() {
             if (estado.itensConferidos.length === 0) return;
 
@@ -845,32 +1654,24 @@
 
             mostrarEtiqueta(volume);
 
-            estado.itensConferidos = [];
-            estado.itensPendentes.forEach(item => {
-                if (item.quantidadeConferida >= item.quantidade) {
-                    item.quantidadeConferida = 0;
-                    item.conferido = false;
-                }
+            // LIMPAR APENAS ITENS TOTALMENTE CONFERIDOS
+            // Itens parciais permanecem na lista de pendentes
+            estado.itensPendentes = estado.itensPendentes.filter(item => {
+                // Se item foi totalmente conferido, remove da lista de pendentes
+                // Se foi parcialmente conferido, mantém com a quantidade já conferida
+                return item.quantidadeConferida < item.quantidade;
             });
+
+            // Limpar lista de conferidos para próximo volume
+            estado.itensConferidos = [];
 
             renderizarItens();
             showToast(`Volume ${volume.numero} finalizado!`, 'success');
         }
 
-        function finalizarCheckout() {
-            const totalPendentes = estado.itensPendentes.reduce((acc, item) => 
-                acc + Math.max(0, item.quantidade - item.quantidadeConferida), 0);
-
-            if (totalPendentes > 0) {
-                if (!confirm(`Ainda existem ${totalPendentes} item(s) pendente(s). Finalizar mesmo assim?`)) {
-                    return;
-                }
-            }
-
-            showToast('Checkout finalizado com sucesso!', 'success');
-            setTimeout(voltarLista, 1500);
-        }
-
+        // ==========================================
+        // ETIQUETA E IMPRESSÃO (CORRIGIDA)
+        // ==========================================
         function mostrarEtiqueta(volume) {
             const modal = document.getElementById('modal-etiqueta');
             const preview = document.getElementById('etiqueta-preview');
@@ -879,51 +1680,49 @@
             const barcodeId = 'barcode-' + Date.now();
 
             preview.innerHTML = `
-                <div class="etiqueta-content">
-                    <div class="etiqueta-header">
-                        <h2 style="margin: 0; font-size: 1.25rem;">ETIQUETA DE TRANSPORTE</h2>
-                        <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #6b7280;">Omie ERP - Conferência de Pedidos</p>
+                <div class="etiqueta-header">
+                    <h2>Etiqueta de Transporte</h2>
+                    <p>Omie ERP - Conferência de Pedidos</p>
+                </div>
+
+                <div class="etiqueta-grid">
+                    <div class="etiqueta-field">
+                        <div class="etiqueta-label">Nº do Pedido</div>
+                        <div class="etiqueta-value">${p.numero}</div>
+                    </div>
+                    <div class="etiqueta-field">
+                        <div class="etiqueta-label">Nº da NF</div>
+                        <div class="etiqueta-value">${p.nfNumero}</div>
                     </div>
 
-                    <div class="etiqueta-grid">
-                        <div class="etiqueta-field">
-                            <div class="etiqueta-label">Nº DO PEDIDO</div>
-                            <div class="etiqueta-value">${p.numero}</div>
-                        </div>
-                        <div class="etiqueta-field">
-                            <div class="etiqueta-label">Nº DA NF</div>
-                            <div class="etiqueta-value">${p.nfNumero}</div>
-                        </div>
-
-                        <div class="etiqueta-field full">
-                            <div class="etiqueta-label">DESTINATÁRIO</div>
-                            <div class="etiqueta-value">${p.nomeCliente}</div>
-                            <div style="font-size: 0.75rem; color: #6b7280;">${p.cnpjCliente || ''}</div>
-                        </div>
-
-                        <div class="etiqueta-field full">
-                            <div class="etiqueta-label">TRANSPORTADORA</div>
-                            <div class="etiqueta-value">${p.transportadora}</div>
-                        </div>
-
-                        <div class="etiqueta-field">
-                            <div class="etiqueta-label">DATA</div>
-                            <div class="etiqueta-value">${data}</div>
-                        </div>
-                        <div class="etiqueta-field">
-                            <div class="etiqueta-label">VOLUME</div>
-                            <div class="etiqueta-value">${volume.numero} de ${p.volumes}</div>
-                        </div>
+                    <div class="etiqueta-field full">
+                        <div class="etiqueta-label">Destinatário</div>
+                        <div class="etiqueta-value">${p.nomeCliente}</div>
+                        <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">${p.cnpjCliente || ''}</div>
                     </div>
 
-                    <div class="barcode-area">
-                        <svg id="${barcodeId}"></svg>
-                        <div style="font-family: monospace; font-size: 0.75rem; word-break: break-all;">${formatarChave(p.nfChave)}</div>
+                    <div class="etiqueta-field full">
+                        <div class="etiqueta-label">Transportadora</div>
+                        <div class="etiqueta-value">${p.transportadora}</div>
                     </div>
 
-                    <div style="margin-top: 1rem; font-size: 0.625rem; color: #6b7280; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 0.5rem;">
-                        Documento gerado automaticamente • Sistema de Conferência
+                    <div class="etiqueta-field">
+                        <div class="etiqueta-label">Data</div>
+                        <div class="etiqueta-value">${data}</div>
                     </div>
+                    <div class="etiqueta-field">
+                        <div class="etiqueta-label">Volume</div>
+                        <div class="etiqueta-value">${volume.numero} de ${p.volumes}</div>
+                    </div>
+                </div>
+
+                <div class="barcode-area">
+                    <svg id="${barcodeId}"></svg>
+                    <div class="chave-nfe">${formatarChave(p.nfChave)}</div>
+                </div>
+
+                <div class="etiqueta-footer">
+                    Documento gerado automaticamente • Sistema de Conferência
                 </div>
             `;
 
@@ -932,8 +1731,9 @@
                     JsBarcode(`#${barcodeId}`, p.nfChave, {
                         format: "CODE128",
                         width: 2,
-                        height: 50,
-                        displayValue: false
+                        height: 60,
+                        displayValue: false,
+                        margin: 0
                     });
                 } catch (e) {
                     console.error('Erro ao gerar barcode:', e);
@@ -944,7 +1744,79 @@
         }
 
         function imprimirEtiqueta() {
+            // Imprimir apenas o conteúdo da etiqueta
             window.print();
+        }
+
+        function imprimirEtiquetaParcial() {
+            if (estado.itensConferidos.length === 0) {
+                showToast('Nenhum item conferido para imprimir', 'warning');
+                return;
+            }
+            
+            const volumeTemp = {
+                numero: estado.volumesFinalizados.length + 1,
+                itens: [...estado.itensConferidos],
+                data: new Date().toISOString(),
+                parcial: true
+            };
+            
+            mostrarEtiqueta(volumeTemp);
+        }
+
+        // ==========================================
+        // AÇÕES FINAIS
+        // ==========================================
+        function finalizarCheckout() {
+            const totalPendentes = estado.itensPendentes.reduce((acc, item) => 
+                acc + Math.max(0, item.quantidade - item.quantidadeConferida), 0);
+
+            if (totalPendentes > 0) {
+                if (!confirm(`Ainda existem ${totalPendentes} unidade(s) pendente(s). Deseja finalizar mesmo assim?`)) {
+                    return;
+                }
+            }
+
+            showToast('Conferência finalizada com sucesso!', 'success');
+            setTimeout(voltarLista, 1500);
+        }
+
+        function checkoutParcial() {
+            if (estado.itensConferidos.length === 0) {
+                showToast('Nenhum item conferido', 'warning');
+                return;
+            }
+            
+            if (confirm('Deseja realizar checkout parcial com os itens já conferidos?')) {
+                showToast('Checkout parcial realizado!', 'success');
+                voltarLista();
+            }
+        }
+
+        function reiniciarConferencia() {
+            if (!confirm('Deseja reiniciar a conferência? Todos os itens voltarão para pendentes.')) {
+                return;
+            }
+            
+            // Resetar quantidades
+            estado.itensPendentes.forEach(item => {
+                item.quantidadeConferida = 0;
+                item.conferido = false;
+            });
+            
+            // Mover todos de conferidos para pendentes
+            estado.itensConferidos.forEach(item => {
+                const original = estado.itensPendentes.find(p => p.codigo === item.codigo);
+                if (!original) {
+                    estado.itensPendentes.push({...item, quantidadeConferida: 0, conferido: false});
+                }
+            });
+            
+            estado.itensConferidos = [];
+            estado.volumesFinalizados = [];
+            
+            renderizarItens();
+            showToast('Conferência reiniciada', 'info');
         }
 
         function voltarLista() {
@@ -960,6 +1832,9 @@
             document.getElementById(id).classList.add('hidden');
         }
 
+        // ==========================================
+        // UTILITÁRIOS
+        // ==========================================
         function showLoading(show, msg = 'Carregando...') {
             const el = document.getElementById('loading');
             if (show) {
@@ -992,6 +1867,7 @@
             }, 3000);
         }
 
+        // Atalhos de teclado
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal:not(.hidden)').forEach(m => m.classList.add('hidden'));
