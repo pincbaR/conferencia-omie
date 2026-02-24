@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conferência de Pedidos - Omie ERP</title>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Outras libs -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-100: #f3f4f6;
+            --gray-800: #1f2937;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body { background: var(--gray-100); color: var(--gray-800); }
+
+        .header {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { width: 48px; height: 48px; background: var(--primary); border-radius: 12px; 
+                     display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+
+        .pedido-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .pedido-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: var(--primary); }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tag-amazon { background: #ff9900; color: white; }
+        .tag-mercadolivre { background: #ffe600; color: #333; }
+        .tag-magalu { background: #0086ff; color: white; }
+        .tag-default { background: var(--gray-100); color: #666; }
+
+        .input-field {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .input-field input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .input-field input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .item-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .item-card.conferido { opacity: 0.6; background: #f9fafb; }
+
+        .item-imagem { width: 60px; height: 60px; background: #f3f4f6; border-radius: 8px; 
+                       display: flex; align-items: center; justify-content: center; }
+
+        .item-info { flex: 1; }
+        .item-nome { font-weight: 600; margin-bottom: 0.25rem; }
+        .item-detalhes { font-size: 0.875rem; color: #6b7280; }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            background: #374151;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        .badge.success { background: var(--success); }
+
+        .hidden { display: none !important; }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 50px; height: 50px;
+            border: 4px solid #e5e7eb;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast-container {
+            position: fixed;
+            top: 20px; right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            animation: slideIn 0.3s ease-out;
+            min-width: 300px;
+        }
+
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .etiqueta-preview {
+            background: white;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .etiqueta-content {
+            max-width: 400px;
+            margin: 0 auto;
+            border: 2px solid #1f2937;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: white;
+            text-align: left;
+        }
+
+        .etiqueta-header {
+            text-align: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #1f2937;
+        }
+
+        .etiqueta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .etiqueta-field.full { grid-column: 1 / -1; }
+        .etiqueta-label { font-size: 0.625rem; color: #6b7280; text-transform: uppercase; }
+        .etiqueta-value { font-size: 0.875rem; font-weight: 700; }
+
+        .barcode-area { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; }
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body { padding: 1.5rem; overflow-y: auto; max-height: 60vh; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+        .close-btn {
+            background: none; border: none; font-size: 1.5rem; color: #9ca3af;
+            cursor: pointer; width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+        }
+
+        .close-btn:hover { background: #f3f4f6; color: #6b7280; }
+
+        .config-box {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .config-box h4 { color: #166534; margin-bottom: 0.5rem; }
+        .config-box p { color: #166534; font-size: 0.875rem; margin: 0.25rem 0; }
+
+        @media print {
+            .header, .input-field, .modal { display: none !important; }
+            .etiqueta-content { border: 2px solid #000; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div id="loading" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">📦</div>
+            <div>
+                <h1>Conferência de Pedidos</h1>
+                <p style="font-size: 0.875rem; color: #9ca3af;">Omie ERP + Supabase</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <span id="status-badge" style="padding: 0.5rem 1rem; background: rgba(16,185,129,0.2); color: #10b981; border-radius: 20px; font-size: 0.875rem;">
+                <i class="fas fa-circle" style="font-size: 0.5rem; margin-right: 0.5rem;"></i>Online
+            </span>
+            <button class="btn" style="background: rgba(255,255,255,0.1); color: white;" onclick="toggleSimulacao()">
+                <i class="fas fa-flask"></i> Demo
+            </button>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main-container">
+        <!-- Configuração Automática -->
+        <section id="config-section" class="card">
+            <h2 style="margin-bottom: 1rem;"><i class="fas fa-cog"></i> Configuração do Sistema</h2>
+
+            <div class="config-box">
+                <h4><i class="fas fa-check-circle"></i> Supabase Configurado!</h4>
+                <p><strong>Project URL:</strong> https://jdwapykybazd1hrzgpmh.supabase.co</p>
+                <p><strong>Status:</strong> Aguardando conexão...</p>
+            </div>
+
+            <div style="display: grid; gap: 1rem;">
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Omie App Key</label>
+                    <input type="text" id="omie-key" placeholder="Sua App Key do Omie" value="6873106126887"
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Omie App Secret</label>
+                    <input type="password" id="omie-secret" placeholder="Seu App Secret do Omie" value="3511699b0759dee093f2d1e6a3e1a2ac"
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px;">
+                </div>
+
+                <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                    <p style="color: #92400e; font-size: 0.875rem; margin: 0;">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Importante:</strong> Para conectar com Omie, você precisa criar uma 
+                        <strong>Edge Function</strong> no Supabase. Veja o guia abaixo ou use o modo Demo para testar.
+                    </p>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="conectarSupabase()" style="flex: 1; justify-content: center;">
+                        <i class="fas fa-plug"></i> Conectar com Omie
+                    </button>
+                    <button class="btn" onclick="toggleSimulacao()" style="background: #8b5cf6; color: white; flex: 1; justify-content: center;">
+                        <i class="fas fa-flask"></i> Usar Modo Demo
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lista de Pedidos -->
+        <section id="pedidos-section" class="hidden">
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2><i class="fas fa-clipboard-list"></i> Pedidos Faturados</h2>
+                    <p style="color: #6b7280; font-size: 0.875rem;">Selecione um pedido para conferir</p>
+                </div>
+                <button class="btn btn-primary" onclick="carregarPedidos()">
+                    <i class="fas fa-sync"></i> Atualizar
+                </button>
+            </div>
+
+            <div id="lista-pedidos" class="grid">
+                <!-- Pedidos serão carregados aqui -->
+            </div>
+        </section>
+
+        <!-- Detalhes do Pedido -->
+        <section id="detalhes-section" class="hidden">
+            <button class="btn" style="margin-bottom: 1rem; background: #f3f4f6; color: #374151;" onclick="voltarLista()">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+
+            <div class="card">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Pedido</label>
+                        <div id="info-pedido" style="font-size: 1.25rem; font-weight: 700;">-</div>
+                        <span id="tag-origem" class="tag tag-default">-</span>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Cliente</label>
+                        <div id="info-cliente" style="font-size: 1.125rem; font-weight: 700;">-</div>
+                        <div id="info-cnpj" style="font-size: 0.875rem; color: #6b7280;">-</div>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Nota Fiscal</label>
+                        <div id="info-nf" style="font-size: 1.125rem; font-weight: 700;">-</div>
+                        <div id="info-chave" style="font-size: 0.75rem; color: #6b7280; font-family: monospace;">-</div>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Transportadora</label>
+                        <div id="info-transportadora" style="font-size: 1.125rem; font-weight: 700;">-</div>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Volumes</label>
+                        <div id="info-volumes" style="font-size: 1.125rem; font-weight: 700;">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conferência -->
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;"><i class="fas fa-barcode"></i> Conferência de Itens</h3>
+
+                <div class="input-field">
+                    <input type="text" id="input-codigo" placeholder="Escaneie o código de barras ou digite o SKU..." autofocus>
+                    <button class="btn btn-success" onclick="conferirItem()">
+                        <i class="fas fa-check"></i> Conferir
+                    </button>
+                </div>
+
+                <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; cursor: pointer;">
+                    <input type="checkbox" id="modo-individual" style="width: 20px; height: 20px;">
+                    <span>Modo Individual (bipe cada item separadamente)</span>
+                </label>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <!-- Pendentes -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4><i class="fas fa-clock"></i> Pendentes</h4>
+                            <span id="badge-pendentes" class="badge">0</span>
+                        </div>
+                        <div id="lista-pendentes" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Itens pendentes -->
+                        </div>
+                    </div>
+
+                    <!-- Conferidos -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4><i class="fas fa-check-circle"></i> Conferidos</h4>
+                            <span id="badge-conferidos" class="badge success">0</span>
+                        </div>
+                        <div id="lista-conferidos" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Itens conferidos -->
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb; display: flex; gap: 1rem;">
+                    <button class="btn btn-warning" id="btn-volume" onclick="finalizarVolume()" disabled>
+                        <i class="fas fa-box-open"></i> Finalizar Volume
+                    </button>
+                    <button class="btn btn-primary" id="btn-checkout" onclick="finalizarCheckout()" disabled>
+                        <i class="fas fa-flag-checkered"></i> Finalizar Checkout
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Etiqueta -->
+    <div id="modal-etiqueta" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-barcode"></i> Etiqueta de Transporte</h3>
+                <button class="close-btn" onclick="fecharModal('modal-etiqueta')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="etiqueta-preview" class="etiqueta-preview">
+                    <!-- Preview -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: #f3f4f6; color: #374151;" onclick="fecharModal('modal-etiqueta')">Fechar</button>
+                <button class="btn btn-primary" onclick="imprimirEtiqueta()">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        // ==========================================
+        // CONFIGURAÇÕES AUTOMÁTICAS (JÁ CONFIGURADO)
+        // ==========================================
+        const SUPABASE_URL = 'https://jdwapykybazd1hrzgpmh.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impkd2FweWt5YmF6ZDFocnpncG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDg3NjU0MDAsImV4cCI6MjAyNDM0MTQwMH0.HCSmV7eu';
+
+        let supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let omieConfig = {
+            appKey: '6873106126887',
+            appSecret: '3511699b0759dee093f2d1e6a3e1a2ac',
+            baseUrl: 'https://app.omie.com.br/api/v1'
+        };
+
+        // Resto do código JavaScript (igual ao anterior)
+        let estado = {
+            modoSimulacao: false,
+            pedidos: [],
+            pedidoAtual: null,
+            itensPendentes: [],
+            itensConferidos: [],
+            volumesFinalizados: [],
+            modoIndividual: false
+        };
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('input-codigo').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') conferirItem();
+            });
+
+            document.getElementById('modo-individual').addEventListener('change', (e) => {
+                estado.modoIndividual = e.target.checked;
+            });
+        });
+
+        async function conectarSupabase() {
+            omieConfig.appKey = document.getElementById('omie-key').value.trim();
+            omieConfig.appSecret = document.getElementById('omie-secret').value.trim();
+
+            if (!omieConfig.appKey || !omieConfig.appSecret) {
+                showToast('Preencha as credenciais do Omie!', 'error');
+                return;
+            }
+
+            showLoading(true, 'Testando conexão...');
+
+            try {
+                // Tentar chamar Edge Function
+                const { data, error } = await supabaseClient.functions.invoke('omie-proxy', {
+                    body: {
+                        endpoint: 'geral/empresas',
+                        call: 'ListarEmpresas',
+                        param: [{}],
+                        appKey: omieConfig.appKey,
+                        appSecret: omieConfig.appSecret
+                    }
+                });
+
+                if (error) throw error;
+
+                showToast('Conectado com sucesso!', 'success');
+                document.getElementById('config-section').classList.add('hidden');
+                document.getElementById('pedidos-section').classList.remove('hidden');
+                carregarPedidos();
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao conectar. Ativando modo simulação...', 'warning');
+                setTimeout(() => toggleSimulacao(), 1500);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Funções de simulação e conferência (mantidas do código anterior)
+        function toggleSimulacao() {
+            estado.modoSimulacao = !estado.modoSimulacao;
+
+            if (estado.modoSimulacao) {
+                document.getElementById('config-section').classList.add('hidden');
+                document.getElementById('pedidos-section').classList.remove('hidden');
+                carregarPedidosSimulados();
+                showToast('Modo simulação ativado!', 'info');
+            }
+        }
+
+        function carregarPedidosSimulados() {
+            estado.pedidos = [
+                {
+                    codigo: '123456',
+                    numero: 'PED-2024-003',
+                    cliente: '123',
+                    nomeCliente: 'Pedro Costa ME',
+                    cnpjCliente: '11.222.333/0001-44',
+                    nfNumero: '12347',
+                    nfSerie: '1',
+                    nfChave: '35240212345678000190550010001234751234567890',
+                    transportadora: 'Total Express',
+                    volumes: 3,
+                    peso: { bruto: 3.2, liquido: 2.8 },
+                    origem: 'Amazon',
+                    itens: [
+                        { codigo: '001', sku: 'TAB-10-64GB', nome: 'Tablet 10" 64GB', ean: '7891234567895', quantidade: 3, imagem: 'https://placehold.co/60x60/3b82f6/ffffff?text=TAB' },
+                        { codigo: '002', sku: 'PEL-VID-10', nome: 'Película de Vidro', ean: '7891234567896', quantidade: 3, imagem: 'https://placehold.co/60x60/10b981/ffffff?text=PEL' },
+                        { codigo: '003', sku: 'CAP-TEC-10', nome: 'Capa com Teclado', ean: '7891234567897', quantidade: 3, imagem: 'https://placehold.co/60x60/f59e0b/ffffff?text=CAP' }
+                    ]
+                },
+                {
+                    codigo: '123457',
+                    numero: 'PED-2024-004',
+                    cliente: '124',
+                    nomeCliente: 'Empresa Exemplo Ltda',
+                    cnpjCliente: '22.333.444/0001-55',
+                    nfNumero: '12348',
+                    nfSerie: '1',
+                    nfChave: '35240212345678000190550010001234861234567891',
+                    transportadora: 'Correios',
+                    volumes: 1,
+                    peso: { bruto: 0.5, liquido: 0.3 },
+                    origem: 'Mercado Livre',
+                    itens: [
+                        { codigo: '004', sku: 'MOUSE-WL', nome: 'Mouse Wireless', ean: '7891234567898', quantidade: 2, imagem: 'https://placehold.co/60x60/ef4444/ffffff?text=MOU' }
+                    ]
+                }
+            ];
+
+            renderizarPedidos();
+            showToast('Dados de demonstração carregados', 'success');
+        }
+
+        async function carregarPedidos() {
+            if (estado.modoSimulacao) {
+                carregarPedidosSimulados();
+                return;
+            }
+
+            showLoading(true, 'Buscando pedidos...');
+
+            try {
+                const { data, error } = await supabaseClient.functions.invoke('omie-proxy', {
+                    body: {
+                        endpoint: 'produtos/pedido',
+                        call: 'ListarPedidos',
+                        param: [{ pagina: 1, registros_por_pagina: 50 }],
+                        appKey: omieConfig.appKey,
+                        appSecret: omieConfig.appSecret
+                    }
+                });
+
+                if (error) throw error;
+
+                // Processar pedidos (simplificado)
+                estado.pedidos = [];
+                showToast('Pedidos carregados!', 'success');
+                renderizarPedidos();
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao carregar. Use modo Demo.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function renderizarPedidos() {
+            const container = document.getElementById('lista-pedidos');
+
+            if (estado.pedidos.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                        <i class="fas fa-inbox" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                        <p>Nenhum pedido encontrado</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = estado.pedidos.map(p => `
+                <div class="pedido-card" onclick="selecionarPedido('${p.codigo}')">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div style="font-size: 1.25rem; font-weight: 700;">${p.numero}</div>
+                        <span class="tag tag-${p.origem.toLowerCase().replace(/\s/g, '')}">${p.origem}</span>
+                    </div>
+                    <div style="display: grid; gap: 0.5rem; color: #6b7280; font-size: 0.875rem;">
+                        <div><i class="fas fa-user" style="width: 20px;"></i> ${p.nomeCliente}</div>
+                        <div><i class="fas fa-file-invoice" style="width: 20px;"></i> ${p.nfNumero}</div>
+                        <div><i class="fas fa-truck" style="width: 20px;"></i> ${p.transportadora}</div>
+                        <div><i class="fas fa-boxes" style="width: 20px;"></i> ${p.volumes} volume(s) - ${p.peso.bruto}kg</div>
+                    </div>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #10b981; font-weight: 600;"><i class="fas fa-check-circle"></i> Faturado</span>
+                        <span style="color: #9ca3af; font-size: 0.875rem;">${p.itens.length} itens</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selecionarPedido(codigo) {
+            estado.pedidoAtual = estado.pedidos.find(p => p.codigo === codigo);
+            if (!estado.pedidoAtual) return;
+
+            estado.itensPendentes = estado.pedidoAtual.itens.map(item => ({
+                ...item,
+                quantidadeConferida: 0,
+                conferido: false
+            }));
+            estado.itensConferidos = [];
+            estado.volumesFinalizados = [];
+
+            document.getElementById('pedidos-section').classList.add('hidden');
+            document.getElementById('detalhes-section').classList.remove('hidden');
+
+            document.getElementById('info-pedido').textContent = estado.pedidoAtual.numero;
+            document.getElementById('tag-origem').textContent = estado.pedidoAtual.origem;
+            document.getElementById('tag-origem').className = `tag tag-${estado.pedidoAtual.origem.toLowerCase().replace(/\s/g, '')}`;
+            document.getElementById('info-cliente').textContent = estado.pedidoAtual.nomeCliente;
+            document.getElementById('info-cnpj').textContent = estado.pedidoAtual.cnpjCliente || '';
+            document.getElementById('info-nf').textContent = `${estado.pedidoAtual.nfNumero} (Série ${estado.pedidoAtual.nfSerie})`;
+            document.getElementById('info-chave').textContent = formatarChave(estado.pedidoAtual.nfChave);
+            document.getElementById('info-transportadora').textContent = estado.pedidoAtual.transportadora;
+            document.getElementById('info-volumes').textContent = `${estado.pedidoAtual.volumes} volume(s) - ${estado.pedidoAtual.peso.bruto}kg`;
+
+            renderizarItens();
+            document.getElementById('input-codigo').focus();
+        }
+
+        function formatarChave(chave) {
+            if (!chave || chave.length !== 44) return chave || 'N/A';
+            return chave.match(/.{1,4}/g).join(' ');
+        }
+
+        function renderizarItens() {
+            const pendentesContainer = document.getElementById('lista-pendentes');
+            const conferidosContainer = document.getElementById('lista-conferidos');
+
+            const totalPendentes = estado.itensPendentes.reduce((acc, item) => 
+                acc + Math.max(0, item.quantidade - item.quantidadeConferida), 0);
+            const totalConferidos = estado.itensConferidos.reduce((acc, item) => 
+                acc + item.quantidadeConferida, 0);
+
+            document.getElementById('badge-pendentes').textContent = totalPendentes;
+            document.getElementById('badge-conferidos').textContent = totalConferidos;
+
+            const pendentes = estado.itensPendentes.filter(item => item.quantidadeConferida < item.quantidade);
+
+            if (pendentes.length === 0) {
+                pendentesContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #10b981;">
+                        <i class="fas fa-check-circle" style="font-size: 2rem;"></i>
+                        <p style="margin-top: 0.5rem;">Todos conferidos!</p>
+                    </div>
+                `;
+            } else {
+                pendentesContainer.innerHTML = pendentes.map(item => `
+                    <div class="item-card">
+                        <div class="item-imagem">
+                            <img src="${item.imagem}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" 
+                                 onerror="this.src='https://placehold.co/60x60/cccccc/666666?text=PROD'">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-nome">${item.nome}</div>
+                            <div class="item-detalhes">SKU: ${item.sku} | EAN: ${item.ean}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.25rem; font-weight: 700;">${item.quantidadeConferida}/${item.quantidade}</div>
+                            <div style="font-size: 0.75rem; color: #6b7280;">unidades</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (estado.itensConferidos.length === 0) {
+                conferidosContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #9ca3af;">
+                        <i class="fas fa-box-open" style="font-size: 2rem;"></i>
+                        <p style="margin-top: 0.5rem;">Nenhum item conferido</p>
+                    </div>
+                `;
+            } else {
+                conferidosContainer.innerHTML = estado.itensConferidos.map(item => `
+                    <div class="item-card conferido">
+                        <div class="item-imagem">
+                            <img src="${item.imagem}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+                                 onerror="this.src='https://placehold.co/60x60/cccccc/666666?text=PROD'">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-nome">${item.nome}</div>
+                            <div class="item-detalhes">SKU: ${item.sku}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.25rem; font-weight: 700; color: #10b981;">${item.quantidadeConferida}</div>
+                            <div style="font-size: 0.75rem; color: #6b7280;">conferido</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('btn-volume').disabled = estado.itensConferidos.length === 0;
+            document.getElementById('btn-checkout').disabled = totalPendentes > 0 && estado.itensConferidos.length === 0;
+        }
+
+        function conferirItem() {
+            const input = document.getElementById('input-codigo');
+            const codigo = input.value.trim();
+
+            if (!codigo) {
+                showToast('Digite ou escaneie um código', 'warning');
+                return;
+            }
+
+            let itemIndex = estado.itensPendentes.findIndex(item => 
+                item.ean === codigo || item.sku === codigo || item.codigo === codigo
+            );
+
+            if (itemIndex === -1) {
+                showToast(`Item não encontrado: ${codigo}`, 'error');
+                input.value = '';
+                input.focus();
+                return;
+            }
+
+            const item = estado.itensPendentes[itemIndex];
+
+            if (item.quantidadeConferida >= item.quantidade) {
+                showToast(`${item.nome} já está completo!`, 'warning');
+                input.value = '';
+                input.focus();
+                return;
+            }
+
+            if (estado.modoIndividual) {
+                item.quantidadeConferida++;
+                showToast(`${item.nome} - ${item.quantidadeConferida}/${item.quantidade}`, 'success');
+            } else {
+                item.quantidadeConferida = item.quantidade;
+                showToast(`${item.nome} - Quantidade total conferida`, 'success');
+            }
+
+            if (item.quantidadeConferida >= item.quantidade) {
+                item.conferido = true;
+                estado.itensConferidos.unshift({ ...item });
+            }
+
+            input.value = '';
+            input.focus();
+            renderizarItens();
+        }
+
+        function finalizarVolume() {
+            if (estado.itensConferidos.length === 0) return;
+
+            const volume = {
+                numero: estado.volumesFinalizados.length + 1,
+                itens: [...estado.itensConferidos],
+                data: new Date().toISOString()
+            };
+
+            estado.volumesFinalizados.push(volume);
+
+            mostrarEtiqueta(volume);
+
+            estado.itensConferidos = [];
+            estado.itensPendentes.forEach(item => {
+                if (item.quantidadeConferida >= item.quantidade) {
+                    item.quantidadeConferida = 0;
+                    item.conferido = false;
+                }
+            });
+
+            renderizarItens();
+            showToast(`Volume ${volume.numero} finalizado!`, 'success');
+        }
+
+        function finalizarCheckout() {
+            const totalPendentes = estado.itensPendentes.reduce((acc, item) => 
+                acc + Math.max(0, item.quantidade - item.quantidadeConferida), 0);
+
+            if (totalPendentes > 0) {
+                if (!confirm(`Ainda existem ${totalPendentes} item(s) pendente(s). Finalizar mesmo assim?`)) {
+                    return;
+                }
+            }
+
+            showToast('Checkout finalizado com sucesso!', 'success');
+            setTimeout(voltarLista, 1500);
+        }
+
+        function mostrarEtiqueta(volume) {
+            const modal = document.getElementById('modal-etiqueta');
+            const preview = document.getElementById('etiqueta-preview');
+            const p = estado.pedidoAtual;
+            const data = new Date().toLocaleString('pt-BR');
+            const barcodeId = 'barcode-' + Date.now();
+
+            preview.innerHTML = `
+                <div class="etiqueta-content">
+                    <div class="etiqueta-header">
+                        <h2 style="margin: 0; font-size: 1.25rem;">ETIQUETA DE TRANSPORTE</h2>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #6b7280;">Omie ERP - Conferência de Pedidos</p>
+                    </div>
+
+                    <div class="etiqueta-grid">
+                        <div class="etiqueta-field">
+                            <div class="etiqueta-label">Nº DO PEDIDO</div>
+                            <div class="etiqueta-value">${p.numero}</div>
+                        </div>
+                        <div class="etiqueta-field">
+                            <div class="etiqueta-label">Nº DA NF</div>
+                            <div class="etiqueta-value">${p.nfNumero}</div>
+                        </div>
+
+                        <div class="etiqueta-field full">
+                            <div class="etiqueta-label">DESTINATÁRIO</div>
+                            <div class="etiqueta-value">${p.nomeCliente}</div>
+                            <div style="font-size: 0.75rem; color: #6b7280;">${p.cnpjCliente || ''}</div>
+                        </div>
+
+                        <div class="etiqueta-field full">
+                            <div class="etiqueta-label">TRANSPORTADORA</div>
+                            <div class="etiqueta-value">${p.transportadora}</div>
+                        </div>
+
+                        <div class="etiqueta-field">
+                            <div class="etiqueta-label">DATA</div>
+                            <div class="etiqueta-value">${data}</div>
+                        </div>
+                        <div class="etiqueta-field">
+                            <div class="etiqueta-label">VOLUME</div>
+                            <div class="etiqueta-value">${volume.numero} de ${p.volumes}</div>
+                        </div>
+                    </div>
+
+                    <div class="barcode-area">
+                        <svg id="${barcodeId}"></svg>
+                        <div style="font-family: monospace; font-size: 0.75rem; word-break: break-all;">${formatarChave(p.nfChave)}</div>
+                    </div>
+
+                    <div style="margin-top: 1rem; font-size: 0.625rem; color: #6b7280; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 0.5rem;">
+                        Documento gerado automaticamente • Sistema de Conferência
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                try {
+                    JsBarcode(`#${barcodeId}`, p.nfChave, {
+                        format: "CODE128",
+                        width: 2,
+                        height: 50,
+                        displayValue: false
+                    });
+                } catch (e) {
+                    console.error('Erro ao gerar barcode:', e);
+                }
+            }, 100);
+
+            modal.classList.remove('hidden');
+        }
+
+        function imprimirEtiqueta() {
+            window.print();
+        }
+
+        function voltarLista() {
+            document.getElementById('detalhes-section').classList.add('hidden');
+            document.getElementById('pedidos-section').classList.remove('hidden');
+            estado.pedidoAtual = null;
+            estado.itensPendentes = [];
+            estado.itensConferidos = [];
+            estado.volumesFinalizados = [];
+        }
+
+        function fecharModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function showLoading(show, msg = 'Carregando...') {
+            const el = document.getElementById('loading');
+            if (show) {
+                el.querySelector('p').textContent = msg;
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = {
+                success: 'check-circle',
+                error: 'exclamation-circle',
+                warning: 'exclamation-triangle',
+                info: 'info-circle'
+            };
+
+            toast.innerHTML = `<i class="fas fa-${icons[type]}"></i> ${message}`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal:not(.hidden)').forEach(m => m.classList.add('hidden'));
+            }
+            if (e.key === 'F2') {
+                e.preventDefault();
+                const input = document.getElementById('input-codigo');
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
