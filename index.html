@@ -878,20 +878,19 @@
             <div style="display: grid; gap: 1rem;">
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Omie App Key</label>
-                    <input type="text" id="omie-key" placeholder="Sua App Key do Omie" value="6873106126887"
+                    <input type="text" id="omie-key" placeholder="Sua App Key do Omie" value=""
                            style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px;">
                 </div>
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Omie App Secret</label>
-                    <input type="password" id="omie-secret" placeholder="Seu App Secret do Omie" value="3511699b0759dee093f2d1e6a3e1a2ac"
+                    <input type="password" id="omie-secret" placeholder="Seu App Secret do Omie" value=""
                            style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px;">
                 </div>
 
                 <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
                     <p style="color: #92400e; font-size: 0.875rem; margin: 0;">
                         <i class="fas fa-info-circle"></i> 
-                        <strong>Importante:</strong> Para conectar com Omie, você precisa criar uma 
-                        <strong>Edge Function</strong> no Supabase. Veja o guia abaixo ou use o modo Demo para testar.
+                        <strong>Produção:</strong> Certifique-se de que o IP do Supabase está liberado no Omie ERP em Configurações → Segurança → Restrição por IP.
                     </p>
                 </div>
 
@@ -1128,17 +1127,21 @@
 
     <script>
         // ==========================================
-        // CONFIGURAÇÕES
+        // CONFIGURAÇÕES DE PRODUÇÃO
         // ==========================================
         const SUPABASE_URL = 'https://jdwapykybazd1hrzgpmh.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impkd2FweWt5YmF6ZDFocnpncG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDg3NjU0MDAsImV4cCI6MjAyNDM0MTQwMH0.HCSmV7eu';
-        const FUNCTION_NAME = 'smart-api'; // Nome da sua Edge Function
+        const FUNCTION_NAME = 'smart-api';
 
-        let supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // URLs da API
+        const API_URL = `${SUPABASE_URL}/functions/v1/${FUNCTION_NAME}`;
 
+        // ==========================================
+        // CONFIGURAÇÃO DO OMIE (PRODUÇÃO)
+        // ==========================================
         let omieConfig = {
-            appKey: '6873106126887',
-            appSecret: '3511699b0759dee093f2d1e6a3e1a2ac',
+            appKey: '', // Será preenchido pelo usuário
+            appSecret: '', // Será preenchido pelo usuário
             baseUrl: 'https://app.omie.com.br/api/v1'
         };
 
@@ -1165,6 +1168,33 @@
         });
 
         // ==========================================
+        // FUNÇÃO DE CONEXÃO COM OMIE (PRODUÇÃO)
+        // ==========================================
+        async function chamarOmie(endpoint, call, param = []) {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                },
+                body: JSON.stringify({
+                    endpoint,
+                    call,
+                    param,
+                    appKey: omieConfig.appKey,
+                    appSecret: omieConfig.appSecret
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Erro na conexão com Omie');
+            }
+
+            return await response.json();
+        }
+
+        // ==========================================
         // CONEXÃO COM SUPABASE/OMIE
         // ==========================================
         async function conectarSupabase() {
@@ -1179,25 +1209,9 @@
             showLoading(true, 'Testando conexão...');
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/${FUNCTION_NAME}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
-                    },
-                    body: JSON.stringify({
-                        endpoint: 'geral/empresas',
-                        call: 'ListarEmpresas',
-                        param: [{}],
-                        appKey: omieConfig.appKey,
-                        appSecret: omieConfig.appSecret
-                    })
-                });
+                // Testar conexão com Omie via Edge Function
+                const data = await chamarOmie('geral/empresas', 'ListarEmpresas', [{}]);
 
-                if (!response.ok) throw new Error('Erro na conexão');
-
-                const data = await response.json();
-                
                 showToast('Conectado com sucesso!', 'success');
                 document.getElementById('config-section').classList.add('hidden');
                 document.getElementById('pedidos-section').classList.remove('hidden');
@@ -1205,8 +1219,8 @@
 
             } catch (error) {
                 console.error('Erro:', error);
-                showToast('Erro ao conectar. Ativando modo simulação...', 'warning');
-                setTimeout(() => toggleSimulacao(), 1500);
+                showToast('Erro ao conectar: ' + error.message, 'error');
+                // Não ativa modo demo automaticamente em produção
             } finally {
                 showLoading(false);
             }
@@ -1344,43 +1358,66 @@
             showLoading(true, 'Buscando pedidos...');
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/${FUNCTION_NAME}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
-                    },
-                    body: JSON.stringify({
-                        endpoint: 'produtos/pedido',
-                        call: 'ListarPedidos',
-                        param: [{ pagina: 1, registros_por_pagina: 50 }],
-                        appKey: omieConfig.appKey,
-                        appSecret: omieConfig.appSecret
-                    })
-                });
+                // Buscar pedidos faturados do Omie
+                const data = await chamarOmie('produtos/pedido', 'ListarPedidos', [{
+                    pagina: 1,
+                    registros_por_pagina: 50,
+                    // Filtrar apenas pedidos faturados (status F)
+                    filtrar_por_status: 'F'
+                }]);
 
-                if (!response.ok) throw new Error('Erro ao carregar pedidos');
-
-                const data = await response.json();
-                
-                // Processar pedidos da Omie
+                // Processar resposta da Omie
                 estado.pedidos = processarPedidosOmie(data);
                 aplicarFiltro();
                 
-                showToast('Pedidos carregados!', 'success');
+                showToast(`${estado.pedidos.length} pedidos carregados!`, 'success');
 
             } catch (error) {
                 console.error('Erro:', error);
-                showToast('Erro ao carregar. Use modo Demo.', 'error');
+                showToast('Erro ao carregar pedidos: ' + error.message, 'error');
             } finally {
                 showLoading(false);
             }
         }
 
         function processarPedidosOmie(data) {
-            // Implementar processamento real dos dados da Omie
-            // Por enquanto retorna vazio ou dados simulados
-            return [];
+            if (!data || !data.pedido_venda_produto) return [];
+            
+            return data.pedido_venda_produto.map(pedido => ({
+                codigo: pedido.cabecalho.codigo_pedido,
+                numero: pedido.cabecalho.numero_pedido,
+                cliente: pedido.cabecalho.codigo_cliente,
+                nomeCliente: pedido.cabecalho.nome_cliente,
+                cnpjCliente: pedido.cabecalho.cnpj_cpf_cliente,
+                nfNumero: pedido.cabecalho.numero_nf || 'N/A',
+                nfSerie: pedido.cabecalho.serie_nf || '1',
+                nfChave: pedido.cabecalho.chave_nf || '',
+                transportadora: pedido.cabecalho.transportadora || 'Não definida',
+                volumes: pedido.cabecalho.qtde_volumes || 1,
+                peso: { 
+                    bruto: pedido.cabecalho.peso_bruto || 0, 
+                    liquido: pedido.cabecalho.peso_liquido || 0 
+                },
+                origem: detectarOrigem(pedido),
+                itens: (pedido.det || []).map(item => ({
+                    codigo: item.codigo_item,
+                    sku: item.codigo_item,
+                    nome: item.descricao_item,
+                    ean: item.codigo_ean || item.codigo_item,
+                    quantidade: item.quantidade,
+                    imagem: `https://placehold.co/60x60/3b82f6/ffffff?text=${item.codigo_item.substring(0,3)}`
+                }))
+            }));
+        }
+
+        function detectarOrigem(pedido) {
+            // Detectar origem baseado em campos do Omie ou informações do cliente
+            const info = JSON.stringify(pedido).toLowerCase();
+            if (info.includes('amazon')) return 'Amazon';
+            if (info.includes('mercado livre') || info.includes('ml')) return 'Mercado Livre';
+            if (info.includes('shopify')) return 'Shopify';
+            if (info.includes('magalu') || info.includes('magazine')) return 'Magalu';
+            return 'Omie';
         }
 
         // ==========================================
